@@ -26,6 +26,11 @@ $ module load albacore
 $ read_fast5_basecaller.py <params>
 ```
 
+Albacore requires information on the Flowcell and Kit used for sequencing. For the [Tomato Fast5  data](http://www.plabipd.de/portal/solanum-pennellii "Download here"), the following is used:
+
+Flowcell: FLO-MIN106
+Kit: SQK-LSK108
+
 ### Poretools (0.6.0)
 Installed and set up as a module. Here is the module file contents.
 ```
