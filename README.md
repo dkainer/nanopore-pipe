@@ -42,7 +42,7 @@ prepend-path PATH ~/apps/poretools/0.6.0/bin
 prepend-path PYTHONPATH ~/apps/poretools/0.6.0/lib/python2.7/site-packages
 ```
 
-Ro tun Poretools:
+to run Poretools:
 ```
 $ module load poretools
 $ poretools <params>
