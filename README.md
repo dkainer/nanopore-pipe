@@ -6,9 +6,7 @@ These scripts are designed to run on the NCI Raijin cluster. They include PBS pr
 ## Tools
 
 ### Albacore (1.1.1)
-Installed and set up as a module
-
-Here is the module file contents.
+Installed and set up as a module. Here is the module file contents.
 ```
 #%Module1.0#####################################################################
 source /opt/Modules/extensions/extensions.tcl
@@ -26,3 +24,26 @@ To run Albacore:
 ```
 $ module load albacore
 $ read_fast5_basecaller.py <params>
+```
+
+### Poretools (0.6.0)
+Installed and set up as a module. Here is the module file contents.
+```
+#%Module1.0#####################################################################
+source /opt/Modules/extensions/extensions.tcl
+proc ModulesHelp { } {
+        puts stderr "\tAdds poretools bin directory to the path"
+}
+module-whatis "poretools"
+soft-prereq python/2.7.11
+soft-prereq python/2.7.11-matplotlib
+set poretoolsversion 0.6.0
+prepend-path PATH ~/apps/poretools/0.6.0/bin
+prepend-path PYTHONPATH ~/apps/poretools/0.6.0/lib/python2.7/site-packages
+```
+
+Ro tun Poretools:
+```
+$ module load poretools
+$ poretools <params>
+```
