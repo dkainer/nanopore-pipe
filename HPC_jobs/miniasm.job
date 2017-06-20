@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -P xf1
+#PBS -q express
+#PBS -l walltime=03:00:00
+#PBS -l mem=64GB
+#PBS -l ncpus=16
+#PBS -l wd
+#PBS -l jobfs=2GB
+
+# how to call the software
+module load python3/3.4.3
+module load python3/3.4.3-matplotlib
+
+MINIMAP=/short/xf1/src_big/minimap/minimap
+MINIASM=/short/xf1/src_big/miniasm/miniasm
+RACON=/short/xf1/src_big/racon/bin/racon
+QUAST=/short/xf1/src_big/quast-4.5/quast.py
+
+# where to find data and where to put outputs
+FASTQ_BASE=/short/xf1/nanopore/Epauc/fastq
+ASSEMBLY_BASE=/short/xf1/nanopore/Epauc/assembly
+
+mkdir -p ${ASSEMBLY_BASE}/minimap
+mkdir -p ${ASSEMBLY_BASE}/QC
+
+SAMPLE=RB7_A2.trimmed
+
+# use miniasm to quickly assemble the genome from long reads
+# 1. all-against-all overlap map
+# 2. produce a Graphical Fragment Assembly
+# 3. convert GFA to fasta
+# 4. correct with Racon
+
+$MINIMAP -t16 -m0 -L100 -Sw5 ${FASTQ_BASE}/${SAMPLE}.fastq ${FASTQ_BASE}/${SAMPLE}.fastq \
+ | gzip -1 > ${ASSEMBLY_BASE}/minimap/${SAMPLE}.paf.gz
+
+$MINIASM -f ${FASTQ_BASE}/${SAMPLE}.fastq \
+ ${ASSEMBLY_BASE}/minimap/${SAMPLE}.paf.gz > ${ASSEMBLY_BASE}/${SAMPLE}.gfa
+
+awk '/^S/{print ">"$2"\n"$3}' ${ASSEMBLY_BASE}/${SAMPLE}.gfa | fold >  ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.fa
+
+
+# now remap the raw reads to the assembly
+$MINIMAP -t16 ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.fa ${FASTQ_BASE}/${SAMPLE}.fastq \
+ > ${ASSEMBLY_BASE}/minimap/${SAMPLE}.miniasm.remapped1.paf
+
+# RACON round 1 
+$RACON -t 16 ${FASTQ_BASE}/${SAMPLE}.fastq  \
+ ${ASSEMBLY_BASE}/minimap/${SAMPLE}.miniasm.remapped1.paf \
+ ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.fa \
+ ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon1.fa
+
+# remap reads to racon1 assembly 
+$MINIMAP -t16 ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon1.fa ${FASTQ_BASE}/${SAMPLE}.fastq \
+ > ${ASSEMBLY_BASE}/minimap/${SAMPLE}.miniasm.remapped2.paf
+
+# RACON round 2 
+$RACON -t 16 ${FASTQ_BASE}/${SAMPLE}.fastq  \
+ ${ASSEMBLY_BASE}/minimap/${SAMPLE}.miniasm.remapped2.paf \
+ ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon1.fa \
+ ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon2.fa
+ 
+# run some assembly QC on original, racon1 and racon2
+$QUAST --output-dir ${ASSEMBLY_BASE}/QC -t 16 --eukaryote \
+ --labels "${SAMPLE}.miniasm.fa, ${SAMPLE}.miniasm.racon1.fa, ${SAMPLE}.miniasm.racon2.fa" \
+ ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.fa ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon1.fa ${ASSEMBLY_BASE}/${SAMPLE}.miniasm.racon2.fa

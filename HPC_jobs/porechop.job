@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -P xf1
+#PBS -q express
+#PBS -l walltime=02:00:00
+#PBS -l mem=32GB
+#PBS -l ncpus=16
+#PBS -l wd
+
+module load python3
+
+FASTQ_BASE=/short/xf1/nanopore/Epauc/fastq
+
+# use Porechop to trim low quality bases
+/short/xf1/src_big/Porechop/porechop-runner.py -i ${FASTQ_BASE}/RB7_A2.fastq --threads 16 -o ${FASTQ_BASE}/RB7_A2.trimmed.fastq --verbosity 2
+

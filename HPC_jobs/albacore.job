@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -P xf1
+#PBS -q express
+#PBS -l walltime=00:10:00
+#PBS -l mem=32GB
+#PBS -l ncpus=16
+#PBS -l wd
+
+module load albacore
+
+#FAST5_BASE=/short/xf1/nanopore/test/raw
+#FAST5_FOLDER="0000_30000_Eta_16-1_20170602"
+#FASTQ_BASE=/short/xf1/nanopore/test/fastq
+
+
+# Run albacore base caller on single folder of FAST5 files (typically 4000 files) amd output the Fastq
+read_fast5_basecaller.py -i ${FAST5_BASE}/${FAST5_FOLDER} -t 16 --save_path ${FASTQ_BASE}/${FAST5_FOLDER}  -c r94_450bps_linear.cfg -o fastq
+
