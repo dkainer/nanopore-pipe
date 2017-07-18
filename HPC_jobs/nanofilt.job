@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -P xf1
+#PBS -q express
+#PBS -l walltime=02:00:00
+#PBS -l mem=32GB
+#PBS -l ncpus=16
+#PBS -l wd
+
+module load python3/3.5.2
+
+IN=$INFILE		# argument passed from master script
+OUT=$OUTFILE		# argument passed from master script
+
+MINLEN=$LEN
+MINQ=$Q
+HEADBASES=100
+
+# use nanofilt to trim low quality bases and emove low qual and short reads
+zcat $IN | ~/apps/bin/NanoFilt -q $MINQ --headcrop $HEADBASES -l $MINLEN | gzip > $OUT
+
