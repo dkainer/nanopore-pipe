@@ -8,8 +8,10 @@
 
 module load python3
 
-FASTQ_BASE=/short/xf1/nanopore/Epauc/fastq
+IN=$INFILE		# argument passed in from the master script
+OUT=$OUTFILE		# argument passed in from the master script
 
-# use Porechop to trim low quality bases
-/short/xf1/src_big/Porechop/porechop-runner.py -i ${FASTQ_BASE}/RB7_A2.fastq --threads 16 -o ${FASTQ_BASE}/RB7_A2.trimmed.fastq --verbosity 2
+# use Porechop to trim adapters and split reads with an adapter in the middle
+/short/xf1/src_big/Porechop/porechop-runner.py -i $IN -o $OUT \
+ --threads 16 --discard_middle --verbosity 2
 
