@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -P vb2
+#PBS -q express
+#PBS -l walltime=00:30:00
+#PBS -l mem=32GB
+#PBS -l ncpus=4
+#PBS -l wd
+#PBS -j oe
+#PBS -ljobfs=50G
+
+SEQKIT=/short/xf1/src_big/seqkit
+
+IN=$INFILE
+OUT1=$OUTFILE1
+OUT2=$OUTFILE2
+VALPROP=$PROP
+
+
+nlines=$(zcat $IN | wc -l)
+nreads=$((nlines/4))
+
+nval=$(awk -v r=$nreads -v p=$VALPROP 'BEGIN {print int((r*p)) }')
+echo $nlines, $nreads, $nval
+
+# shuffle the fastq file to randomize the reads, then split it into chunks of the size of the proposed validation set
+${SEQKIT} shuffle --rand-seed 999 $IN > $PBS_JOBFS/shuffled.fastq.gz
+${SEQKIT} split -j 2 -s $nval -O ${PBS_JOBFS}/split $PBS_JOBFS/shuffled.fastq.gz
+
+# take the first chunk to be the validation set and merge the remaining chunks back together to be the assembly set
+mv ${PBS_JOBFS}/split/shuffled.part_001.fastq.gz $OUT1
+cat ${PBS_JOBFS}/split/*.fastq.gz > $OUT2
