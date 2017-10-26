@@ -1,14 +1,12 @@
 #!/bin/bash
 
 JOBS=/short/xf1/src_big/nanopore-pipe/HPC_jobs
-PROJ=/short/xf1/nanopore/Epauc
 
+FASTQ_BASE=/g/data1a/xf1/Epauc/nanopore/raw/albacore2
+OUT_BASE=/short/xf1/nanopore/Epauc/fastq
 
-FASTQ_BASE=$PROJ/fastq
-FASTQ_CHOPPED=$FASTQ_BASE/chopped
-FASTQ_FILTERED=$FASTQ_BASE/filtered
-
-
+FASTQ_CHOPPED=${OUT_BASE}/chopped
+FASTQ_FILTERED=${OUT_BASE}/filtered
 
 
 # make the output directory if not made already
@@ -17,7 +15,7 @@ if [ ! -d $FASTQ_CHOPPED ]; then
 fi
 
 
-FASTQFILES=$(find $FASTQ_BASE -name '*.fastq.gz')
+FASTQFILES=$(find $FASTQ_BASE -maxdepth 1 -name '*.fastq.gz')
 
 for f in $FASTQFILES;
 do
