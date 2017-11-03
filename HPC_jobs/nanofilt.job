@@ -1,12 +1,15 @@
 #!/bin/bash
-#PBS -P xf1
+#PBS -P vb2
 #PBS -q express
 #PBS -l walltime=02:00:00
-#PBS -l mem=32GB
+#PBS -l mem=8GB
 #PBS -l ncpus=16
 #PBS -l wd
+#PBS -j oe
 
 module load python3/3.5.2
+SEQTK=/short/xf1/src_big/seqtk-1.2/seqtk
+NANOFILT=~/apps/bin/NanoFilt
 
 IN=$INFILE		# argument passed from master script
 OUT=$OUTFILE		# argument passed from master script
@@ -14,7 +17,12 @@ OUT=$OUTFILE		# argument passed from master script
 MINLEN=$LEN
 MINQ=$Q
 HEADBASES=100
+TAILBASES=100
 
 # use nanofilt to trim low quality bases and emove low qual and short reads
-zcat $IN | ~/apps/bin/NanoFilt -q $MINQ --headcrop $HEADBASES -l $MINLEN | gzip > $OUT
+zcat $IN \
+ | ${SEQTK} trimfq -b $HEADBASES -e $TAILBASES - \
+ | ${SEQTK} seq -L $MINLEN - \
+ | ${NANOFILT} -q $MINQ \
+ | gzip > $OUT
 
