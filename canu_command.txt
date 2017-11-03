@@ -1,0 +1,6 @@
+#### given a set of corrected long reads, use canu to do trimming and assembly
+/short/xf1/src_big/canu-1.6/Linux-amd64/bin/canu -trim-assemble \
+-nanopore-corrected /short/xf1/nanopore/Epauc/fastq/canu_correct/canu_corr150x.correctedReads.fasta.gz \
+-p 150x -d /short/xf1/nanopore/Epauc/assembly/canu_150x -s /short/xf1/src_big/nanopore-pipe/HPC_jobs/canu.params \
+gridOptionsExecutive="-q express -P xf1 -l walltime=24:00:00" \
+useGrid=true
