@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -P xf1
+#PBS -P vb2
 #PBS -q express
 #PBS -l walltime=02:00:00
 #PBS -l mem=32GB
