@@ -1,0 +1,76 @@
+###### General Grid setup options
+#stageDirectory=$PBS_JOBFS
+#gridEngineStageOption="-l jobfs=DISK_SPACEGB"
+gridEngineThreadsOption="-l ncpus=THREADS"
+gridEngineArrayOption="-r y -J ARRAY_JOBS"
+gridEngineArrayMaxJobs=0
+java="/apps/java/jdk1.8.0_60/bin/java"
+
+##### General processing options (used in multiple stages of pipeline)
+gridOptionsExecutive="-q express -P xe2 -l walltime=24:00:00"
+gridOptionsOVB="-q normal -P xe2 -l walltime=04:00:00"		# bucketizing
+gridOptionsOVS="-q normal -P xe2 -l walltime=04:00:00"		# sorting
+merylThreads=16
+merylMemory=32g
+
+ovsMethod="parallel"
+ovsMemory=30g
+genomeSize=500m
+
+
+##### Read correction
+gridOptionsCORMHAP="-q normal -P xe2 -l walltime=04:00:00"
+cormhapThreads=16
+cormhapMemory=32g
+gridOptionsCOROVL="-q normal -P xe2 -l walltime=48:00:00"
+corovlThreads=16
+corovlMemory=32g
+gridOptionsCOR="-q normal -P xe2 -l walltime=48:00:00"
+corMinCoverage=8
+corOutCoverage=999
+corMemory=16g
+
+##### Trim
+correctedErrorRate=0.12		# lowered from 0.144 as recommended by FAQ for coverage > 60x
+gridOptionsOBTOVL="-q normal -P xe2 -l walltime=24:00:00"
+obtovlThreads=16
+obtovlMemory=32g
+overlapper=mhap			# switched from ovl for speed with high coverage loooong reads. potentially more fragmented assembly but necessary for runtime
+utgReAlign=true			# ditto
+gridOptionsOBTMHAP="-q normal -P xe2 -l walltime=08:00:00"
+obtmhapThreads=16
+obtmhapMemory=32g
+
+##### Unitigging
+gridOptionsUTGOVL="-q normal -P vb2 -l walltime=48:00:00"
+gridOptionsUTGMHAP="-q normal -P vb2 -l walltime=48:00:00"
+utgovlThreads=16
+utgovlMemory=32g
+utgmhapThreads=16
+utgmhapMemory=32g
+utgMhapBlockSize=500
+
+##### read error detection
+gridOptionsRED="-q normal -P vb2 -l walltime=16:00:00"
+redThreads=4
+redMemory=16g
+
+##### overlap error adjustment
+gridOptionsOEA="-q normal -P vb2 -l walltime=24:00:00"
+oeaThreads=16
+oeaMemory=32g
+
+##### Graph alignment
+gridOptionsGFA="-q normal -P vb2 -l walltime=16:00:00"
+gfaThreads=16
+gfaMemory=32g
+
+##### Consensus
+gridOptionsCNS="-q normal -P vb2 -l walltime=16:00:00"
+cnsThreads=16
+cnsMemory=32g
+
+gridOptionsBAT="-q normal -P vb2-l walltime=16:00:00"
+batThreads=16
+batMemory=32g
+
